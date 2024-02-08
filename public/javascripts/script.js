@@ -49,6 +49,7 @@ function findValue(value,array) {
   return;
 }
 function calculate(e) {
+  console.log("Hello")
   if(e!=null) { invoiceData[findValue(e.target.parentElement.id,invoiceData)][1]=e.target.value; }
   var all = 0;
   let service = invoiceData.slice(14)
@@ -240,6 +241,7 @@ function populateService(e) {
       div[6].innerHTML = service[6+adj][1];
     } 
   }
+  calculate();
 }
 function editSwitch() {
   if(edit) { edit=false; } else { edit=true; }
@@ -252,17 +254,17 @@ function initService(e) {
   let service = invoiceData.slice(14)
   let size = service.length/7;
   let tr = document.createElement("tr");
-  for (x = 0; x < serviceTemplate[0].length-1; x++) { //here for future 1
+  for (x = 0; x < serviceTemplate[1].length-1; x++) { //here for future 1
     let th = document.createElement("th");
         th.className = "text-center";
-        th.innerHTML = serviceTemplate[0][x+1]; //here for future 1
+        th.innerHTML = serviceTemplate[1][x+1]; //here for future 1
     tr.appendChild(th);
   }
   e.firstChild.appendChild(tr);
   for(let i = 0; i<size; i++) {
     let tr = document.createElement("tr");
     tr.id = "row" + e.lastChild.childElementCount;
-    for (z = 0; z < serviceTemplate[0].length-1; z++) { //here for future 1
+    for (z = 0; z < serviceTemplate[1].length-1; z++) { //here for future 1
       let td = document.createElement("td");
       td.className = "text-center";
       td.id = e.lastChild.childElementCount + "service" + z;
