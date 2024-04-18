@@ -1,0 +1,148 @@
+extends layout
+block content
+  link(rel='stylesheet', href='/stylesheets/invoicestyle.css')
+  script(src='https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js' integrity='sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==' crossorigin='anonymous' referrerpolicy='no-referrer')
+  script(src='/javascripts/built.js')
+  .onload=invoice
+  .invoice
+    .header
+        .title
+          dl.dl-horizontal-heading
+            h1 Invoice
+            h4
+              dt Invoice ID:
+              dd.content#invoice_id
+            h4
+              dt Invoice Date:
+              dd.content#date
+    .invoice-body
+      .row
+        .column.billing
+          .panel
+            .panel-heading
+              h3.panel-title Billing
+            .panel-body
+              dl.dl-horizontal
+                dt To:
+                dd.dropdown
+                  strong.content#client_fullname
+                dt#type NDIS:
+                dd.content#client_number 12345
+                dt Address:
+                dd.content#client_address
+        .column.payment
+          .panel
+            .panel-heading
+              h3.panel-title Payment
+            .panel-body
+              dl.dl-horizontal
+                dt Name:
+                dd
+                  strong.content#user_fullname
+                dt BSB:
+                dd.content#user_bsb
+                dt Account:
+                dd.content#user_account
+                dt Bank:
+                dd.content#user_bank
+        .column.contact
+          .panel
+            .panel-heading
+              h3.panel-title Contact
+            .panel-body
+              dl.dl-horizontal
+                dt Name:
+                dd Jared Stanbrook
+                dt ABN:
+                dd.content#user_abn
+                dt Phone:
+                dd.content#user_phone
+                dt Email:
+                dd.content#user_email
+                dt Address:
+                dd.content#user_address
+      .panel.service
+        .panel-heading
+          h3.panel-title Services / Products
+        table#service.table.table-bordered.table-condensed
+          thead 
+          tbody
+      .footer
+        .total
+          .panel
+            table.table.table-bordered.table-condensed
+              thead
+                tr
+                  td.text-center Balance Due
+                  td.text-center.table-heading 
+                    span(id="total")
+
+  .offpage(data-html2canvas-ignore="true")
+    button(type='button')#type-btn NDIS
+    button(type='button')#status-btn Incomplete
+    button(type='button')#download-btn Download
+    button(type='button')#new-btn New
+    button(type='button')#delete-btn Delete
+    button(type='button')#save-btn Save
+    button(type='button')#previous-btn <
+    button(type='button')#next-btn >
+    button(type='button')#edit-btn Edit
+    button(type='button')#form-btn Form
+    button(type='button')#pallette-btn Dark!
+    input(type="text" id="filter" placeholder="Filter By Client Name...")
+    
+  #myNav.overlay
+    a.closebtn(href='javascript:void(0)' onclick='closeNav()') &times;
+    .form
+      .row
+        .panel
+          .panel-heading
+            h3.panel-title Create Service
+          .panel-body
+            dl.dl-horizontal
+              dt Support Category:
+              dd.text-left
+                <select style="width: 280px" id="Mobility" name="Mobility">
+                  <optgroup label="Core">
+                    <option selected>01 Assistance with Daily Life</option>
+                    <option>02 Transport</option>
+                    <option>03 Consumables</option>
+                    <option>04 Assistance with Social, Economic and Community Participation</option>
+                </select>
+              dt Sequence Number:
+              dd.text-left
+                input(type="text" placeholder="Enter a Number")
+              dt Outcome Domain:
+              dd.text-left
+              <select style="width: 280px" id="Mobility" name="Mobility">
+                  <optgroup label="Core">
+                    <option selected>1. Daily Living</option>
+                    <option>5. Work</option>
+                    <option>6. Social and Community Participation</option>
+              </select>
+              dt Outcome Domain:
+              dd.text-left
+              <select style="width: 280px" id="Mobility" name="Mobility">
+                  <optgroup label="Core">
+                    <option selected>1. Daily Living</option>
+                    <option>5. Work</option>
+                    <option>6. Social and Community Participation</option>
+              </select>
+              dt Start Date:
+              dd.text-left
+                input(type="text" placeholder="Enter a date")
+              dt Start Time:
+              dd.text-left
+                input(type="text" placeholder="Enter a time")
+              dt End Date:
+              dd.text-left
+                input(type="text" placeholder="Enter a date")
+              dt End Time:
+              dd.text-left
+                input(type="text" placeholder="Enter a time")
+              dt Rate:
+              dd.text-left
+                input(type="text" placeholder="Enter rate" value="$50.00")
+              dt
+              dd.text-left
+                button(type='button' onclick='save') Submit
