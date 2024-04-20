@@ -16,7 +16,7 @@ router.use(function (req, res, next) {
 router.get("/", function (req, res, next) {
     (async function () {
         //let client = folder.deepCopy(await Client.find({ first_name: "Seth", family_name: "Smith" }))[0];
-        let latest = folder.deepCopy(await Invoice.find({}).sort({ date: -1, _id: -1 }).limit(1))[0]
+        let latest = folder.deepCopy(await Invoice.find({}).sort({ _id: -1 }).limit(1))[0]
         let file = await folder.retrieveInvoice(await latest._id);
         res.render("index", {
             title: "Invoice App",

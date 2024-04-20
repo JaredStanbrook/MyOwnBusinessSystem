@@ -592,6 +592,10 @@ function InputToText(content) {
         if (content[i].childElementCount > 0) {
             let t = content[i].lastChild.value;
             content[i].innerHTML = t;
+            if (content[i].id == "date") {
+                t = _utils__WEBPACK_IMPORTED_MODULE_0__.parseDMY(t); //utils.parseDMY(t) t.toDateString()
+                content[i].innerHTML = t.toDateString();
+            }
             invoiceData[content[i].id] = t;
         }
     }
@@ -603,7 +607,7 @@ function TextToInput(content) {
             var text = document.createElement("textarea");
             text.className = "input";
             text.value = invoiceData[content[i].id];
-            if (content[i].id == "invoice_date") {
+            if (content[i].id == "date") {
                 text.value = invoiceData[content[i].id].toLocaleDateString();
             }
             content[i].innerHTML = "";
@@ -634,6 +638,9 @@ function TextToInput(content) {
 async function readInvoice(id) {
     if (!id) {
         return;
+    }
+    if (edit) {
+        editSwitch();
     }
     let filterField = document.getElementById("filter").value;
     let div = await getReq({
