@@ -285,6 +285,19 @@ dd {
         margin-left: 95px;
         overflow-wrap: break-word;
     }
+    .dl-horizontal-2 dt {
+        float: left;
+        width: 155px;
+        overflow: hidden;
+        clear: left;
+        text-align: right;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    .dl-horizontal-2 dd {
+        margin-left: 95px;
+        overflow-wrap: break-word;
+    }
     .invoice {
         width: 955px;
     }

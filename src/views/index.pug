@@ -91,58 +91,70 @@ block content
     button(type='button')#pallette-btn Dark!
     input(type="text" id="filter" placeholder="Filter By Client Name...")
     
-  #myNav.overlay
-    a.closebtn(href='javascript:void(0)' onclick='closeNav()') &times;
-    .form
-      .row
+  #service-form.overlay
+    a.closebtn(href='javascript:void(0)')#myNavclose-btn &times;
+    <form name="service-form">
         .panel
           .panel-heading
             h3.panel-title Create Service
           .panel-body
-            dl.dl-horizontal
-              dt Support Category:
+            dl.dl-horizontal-2 
+              dt Item Number:
               dd.text-left
-                <select style="width: 280px" id="Mobility" name="Mobility">
-                  <optgroup label="Core">
-                    <option selected>01 Assistance with Daily Life</option>
-                    <option>02 Transport</option>
-                    <option>03 Consumables</option>
-                    <option>04 Assistance with Social, Economic and Community Participation</option>
+                input(type="text" name="item_number" placeholder="Enter a Number")
+              dt Item Name:
+              dd.text-left
+                <select style="width: 280px" name="item_name">
+                  <optgroup label="Assistance with Daily Life">
+                    <option selected>Assistance With Self-Care Activities</option>
+                    <option>Assistance with Personal Domestic Activities</option>
+                    <option>Specialised Home Based Assistance For A Child</option>
+                  <optgroup label="Assistance with Social, Economic and Community Participation">
+                    <option>Access Community Social and Rec Activ - Standard</option>
+                    <option>Community Social and Recreational Activities</option>
+                    <option>Group Activities</option>
+                    <option>Supports in Employment</option>
+                  <optgroup label="Other">
+                    <option>Assistance with Social and Community Event</option>
                 </select>
-              dt Sequence Number:
+              dt Item Level:
               dd.text-left
-                input(type="text" placeholder="Enter a Number")
-              dt Outcome Domain:
+                <select style="width: 280px" name="item_level">
+                  <optgroup label="Assistance Level">
+                    <option selected>Standard</option>
+                    <option>High Intensity</option>
+                    <option>None</option>
+                </select>
+              dt Hourly Rate:
               dd.text-left
-              <select style="width: 280px" id="Mobility" name="Mobility">
-                  <optgroup label="Core">
-                    <option selected>1. Daily Living</option>
-                    <option>5. Work</option>
-                    <option>6. Social and Community Participation</option>
-              </select>
-              dt Outcome Domain:
+                <select style="width: 280px" name="item_rate">
+                  <optgroup label="Rate">
+                    <option selected>50</option>
+                    <option>60</option>
+                    <option>70</option>
+                    <option>110</option>
+                </select>
+              dt Km:
               dd.text-left
-              <select style="width: 280px" id="Mobility" name="Mobility">
-                  <optgroup label="Core">
-                    <option selected>1. Daily Living</option>
-                    <option>5. Work</option>
-                    <option>6. Social and Community Participation</option>
-              </select>
+                input(type="text" name="km" placeholder="Enter a Number")
+              dt Km Rate:
+              dd.text-left
+                <select style="width: 280px" name="km_rate">
+                  <optgroup label="Rate">
+                    <option selected>0.85</option>
+                </select>
               dt Start Date:
               dd.text-left
-                input(type="text" placeholder="Enter a date")
+                input(type="text" name="start_date" placeholder="Enter a date")
               dt Start Time:
               dd.text-left
-                input(type="text" placeholder="Enter a time")
+                input(type="text" name="start_time" placeholder="Enter a time")
               dt End Date:
               dd.text-left
-                input(type="text" placeholder="Enter a date")
+                input(type="text" name="end_date" placeholder="Enter a date")
               dt End Time:
               dd.text-left
-                input(type="text" placeholder="Enter a time")
-              dt Rate:
-              dd.text-left
-                input(type="text" placeholder="Enter rate" value="$50.00")
+                input(type="text" name="end_time" placeholder="Enter a time")
               dt
               dd.text-left
-                button(type='button' onclick='save') Submit
+                button(type='button')#formSubmit-btn Submit
