@@ -11,15 +11,14 @@ const { MongoClient, ObjectId } = require("mongodb");
  * See https://docs.mongodb.com/ecosystem/drivers/node/ for more details
  */
 const connectDB = require("../../config/db");
+var dir = "/Users/jaredstanbrook/Documents/InvoiceApp Working Version/";
 
-function search(dir = "/private/clients") {
+function search() {
     //Searchs within Dir from App Root, Return All Files with key in filename, including ones inside folders
-    var folders = fs.readdirSync(path.join(process.cwd(), dir));
-    var files = [];
-    for (let i = folders.length; i--; ) {
-        let next = fs.readdirSync(path.join(process.cwd(), dir, folders[i]));
-        for (let x = next.length; x--; ) {
-            files.push(next[x]);
+    let files = fs.readdirSync(dir);
+    for (var i = files.length; i--; ) {
+        if (!files[i].includes("invoice")) {
+            files.splice(i, 1);
         }
     }
     return files.sort(function (a, b) {
@@ -35,9 +34,8 @@ async function main() {
 
         for (a = 0; a < files.length; a++) {
             //files.length
-            console.log(files[a]);
-            await delay(5000);
             await listDatabases(files[a]);
+            await delay(5000);
         }
     } catch (e) {
         console.error(e);
@@ -49,69 +47,63 @@ function delay(time) {
 }
 async function listDatabases(file) {
     //databasesList = await client.db().admin().listDatabases();
-    fs.readFile(
-        "./private/clients/" + file.slice(0, -8) + "/" + file,
-        "utf8",
-        async function (err, data) {
-            if (err) {
-                return "No such file or directory!";
-            }
-            data = JSON.parse(await data);
-            let clien = await Client.find({ first_name: data.clientName.split(" ")[0] });
-            //file.client_id = "woop";
-            //console.log(file)
-            let serv = [];
-            for (let i = 0; i < data.invoice.length; i++) {
-                serv.push({
-                    service_date: new Date(
-                        "20" +
-                            data.invoice[i].serviceDate.slice(-2) +
-                            data.invoice[i].serviceDate.slice(2, -2) +
-                            data.invoice[i].serviceDate.slice(0, 2)
-                    ),
-                    line_number: data.invoice[i].lineNumber,
-                    description: data.invoice[i].description,
-                    km: parseFloat(data.invoice[i].km.replace("$", "")),
-                    km_rate: parseFloat(data.invoice[i].kmRate.replace("$", "")),
-                    hour: parseFloat(data.invoice[i].hours.replace("$", "")),
-                    hour_rate: parseFloat(data.invoice[i].hoursRate.replace("$", "")),
-                });
-            }
-            if (data.status == "Uncompleted" || data.status == "uncompleted") {
-                data.status = "incomplete";
-            }
-            //console.log(data.invoiceDate);
-            //console.log(data.invoice[0].serviceDate);
-            //console.log("20"+data.invoiceDate.slice(-2)+data.invoiceDate.slice(2,-4)+data.invoiceDate.slice(0,2));
-            //console.log(new Date(Date.parse("20"+data.invoiceDate.slice(-2)+data.invoiceDate.slice(2,-4)+data.invoiceDate.slice(0,2))))
-            const invoice = new Invoice({
-                invoice_id: data.clientName.replace(" ", "") + data.invoiceId,
-                date: new Date(
-                    Date.parse(
-                        "20" +
-                            data.invoiceDate.slice(-2) +
-                            data.invoiceDate.slice(2, -4) +
-                            data.invoiceDate.slice(0, 2)
-                    )
-                ),
-                client_fullname: data.clientName,
-                client_id: clien[0]._id,
-                client_address: data.clientAddress,
-                user_fullname: data.name,
-                user_bsb: data.bsb,
-                user_account: data.account,
-                user_bank: data.bank,
-                user_abn: data.abn,
-                user_phone: data.phone,
-                user_email: data.email,
-                user_address: data.address,
-                status: data.status,
-                service: serv,
-            });
-            // Insert the article in our MongoDB database
-            await invoice.save();
-            return;
+    fs.readFile(dir + file, "utf8", async function (err, data) {
+        if (err) {
+            return "No such file or directory!";
         }
-    );
+        data = JSON.parse(await data);
+        //console.log(data);
+        let clien = await Client.find({ first_name: data[2][1].split(" ")[0] });
+        //file.client_id = "woop";
+        //console.log(file)
+        let service = data.slice(14);
+        let serv = [];
+        for (let i = 0; i < service.length / 7; i++) {
+            serv.push({
+                service_date: new Date(
+                    "20" +
+                        service[i * 7 + 0][1].slice(-2) +
+                        service[i * 7 + 0][1].slice(2, -2) +
+                        service[i * 7 + 0][1].slice(0, 2)
+                ),
+                line_number: "01_011_077_0_0",
+                description: service[i * 7 + 1][1],
+                km: parseFloat(service[i * 7 + 2][1].replace("$", "")),
+                km_rate: parseFloat(service[i * 7 + 3][1].replace("$", "")),
+                hour: parseFloat(service[i * 7 + 4][1].replace("$", "")),
+                hour_rate: parseFloat(service[i * 7 + 5][1].replace("$", "")),
+            });
+        }
+        //console.log(data.invoiceDate);
+        //console.log(data.invoice[0].serviceDate);
+        //console.log("20"+data.invoiceDate.slice(-2)+data.invoiceDate.slice(2,-4)+data.invoiceDate.slice(0,2));
+        //console.log(new Date(Date.parse("20"+data.invoiceDate.slice(-2)+data.invoiceDate.slice(2,-4)+data.invoiceDate.slice(0,2))))
+        const invoice = new Invoice({
+            invoice_id: data[2][1].split(" ")[0] + data[2][1].split(" ")[1] + "1" + file.slice(8, -4),
+            date: new Date(
+                Date.parse(
+                    "20" + data[1][1].slice(-2) + data[1][1].slice(8, -4) + data[1][1].slice(6, 8)
+                )
+            ),
+            client_fullname: data[2][1],
+            client_id: clien[0]._id,
+            client_number: data[4][1].slice(1),
+            client_address: data[5][1],
+            user_fullname: data[6][1],
+            user_bsb: data[7][1],
+            user_account: data[8][1],
+            user_bank: data[9][1],
+            user_abn: data[10][1],
+            user_phone: data[11][1],
+            user_email: data[12][1],
+            user_address: data[13][1],
+            status: "completed",
+            service: serv,
+        });
+        // Insert the article in our MongoDB database
+        console.log(invoice);
+        await invoice.save();
+        return;
+    });
     //databasesList.databases.forEach(db => console.log(` - ${db.name}`));
 }
