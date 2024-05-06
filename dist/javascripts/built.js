@@ -136,25 +136,29 @@ __webpack_require__.r(__webpack_exports__);
 
 
 document.addEventListener("DOMContentLoaded", function (event) {
-    invoicePath = document.getElementsByClassName("onload")[0].innerHTML.split(",");
-    currentInvoice();
-    document.getElementById("status-btn").addEventListener("click", statusSwitch, false);
-    document.getElementById("type-btn").addEventListener("click", typesSwitch, false);
-    document.getElementById("download-btn").addEventListener("click", downloadInvoice, false);
-    document.getElementById("new-btn").addEventListener("click", newInvoice, false);
-    document.getElementById("delete-btn").addEventListener("click", deleteInvoice, false);
-    document.getElementById("save-btn").addEventListener("click", saveInvoice, false);
-    document.getElementById("previous-btn").addEventListener("click", previousInvoice, false);
-    document.getElementById("next-btn").addEventListener("click", nextInvoice, false);
-    document.getElementById("edit-btn").addEventListener("click", editSwitch, false);
-    document.getElementById("pallette-btn").addEventListener("click", palletteSwitch, false);
+    try {
+        invoicePath = document.getElementsByClassName("onload")[0].innerHTML.split(",");
+        currentInvoice();
+        document.getElementById("status-btn").addEventListener("click", statusSwitch, false);
+        document.getElementById("type-btn").addEventListener("click", typesSwitch, false);
+        document.getElementById("download-btn").addEventListener("click", downloadInvoice, false);
+        document.getElementById("new-btn").addEventListener("click", newInvoice, false);
+        document.getElementById("delete-btn").addEventListener("click", deleteInvoice, false);
+        document.getElementById("save-btn").addEventListener("click", saveInvoice, false);
+        document.getElementById("previous-btn").addEventListener("click", previousInvoice, false);
+        document.getElementById("next-btn").addEventListener("click", nextInvoice, false);
+        document.getElementById("edit-btn").addEventListener("click", editSwitch, false);
+        document.getElementById("pallette-btn").addEventListener("click", palletteSwitch, false);
+    } catch (error) {
+        console.log("Probably not an invoice, need to serparate invoice code from standard code!");
+    }
     document.getElementById("form-btn").addEventListener("click", formOpen, false);
     document.getElementById("myNavclose-btn").addEventListener("click", formClose, false);
     document.getElementById("formSubmit-btn").addEventListener("click", formSubmit, false);
     //document.getElementById("filter").addEventListener("input", filter, false);
 });
 
-const BASE_URL = "http://localhost:3000/mobs";
+const BASE_URL = "http://localhost:80/mobs";
 var invoiceData;
 var invoicePath;
 var edit = false;
@@ -318,7 +322,17 @@ const table_feild_configs = [
     },
 ];
 const serviceHeadings = [
-    ["edit", "Service Date", "Description", "KM", "Rate(KM)", "Hours", "Rate(Hours)", "Ammount"],
+    [
+        "edit",
+        "Service Date",
+        "Line Number",
+        "Description",
+        "KM",
+        "Rate(KM)",
+        "Hours",
+        "Rate(Hours)",
+        "Ammount",
+    ],
     [
         "ndis",
         "Service Date",
@@ -473,7 +487,7 @@ function calculate(e) {
             parseFloat(invoiceData.service[i].km) * parseFloat(invoiceData.service[i].km_rate) +
             parseFloat(invoiceData.service[i].hour) * parseFloat(invoiceData.service[i].hour_rate);
         if (edit) {
-            div[i].childNodes[6].innerHTML = "$".concat(num.toFixed(2));
+            div[i].childNodes[7].innerHTML = "$".concat(num.toFixed(2));
         } else if (!edit) {
             div[i].lastChild.innerHTML = "$".concat(num.toFixed(2));
         }
@@ -533,7 +547,15 @@ function editService(e) {
         tr.appendChild(th);
     }
     e.firstChild.appendChild(tr);
-    let template = ["service_date", "description", "km", "km_rate", "hour", "hour_rate"];
+    let template = [
+        "service_date",
+        "line_number",
+        "description",
+        "km",
+        "km_rate",
+        "hour",
+        "hour_rate",
+    ];
     //Service Table
     let table = [];
     for (let i = 0; i < invoiceData.service.length; i++) {
@@ -702,16 +724,17 @@ function populateService(e) {
         if (edit) {
             //Edit View
             div[0].firstChild.value = invoiceData.service[i].service_date.toLocaleDateString();
-            div[1].firstChild.value = invoiceData.service[i].description;
-            div[2].firstChild.value = invoiceData.service[i].km;
-            div[3].firstChild.value = invoiceData.service[i].km_rate;
-            div[4].firstChild.value = invoiceData.service[i].hour;
-            div[5].firstChild.value = invoiceData.service[i].hour_rate;
+            div[1].firstChild.value = invoiceData.service[i].line_number;
+            div[2].firstChild.value = invoiceData.service[i].description;
+            div[3].firstChild.value = invoiceData.service[i].km;
+            div[4].firstChild.value = invoiceData.service[i].km_rate;
+            div[5].firstChild.value = invoiceData.service[i].hour;
+            div[6].firstChild.value = invoiceData.service[i].hour_rate;
             //div[6].firstChild.value = invoiceData.service[i].total;
         } else if (!edit) {
             //Non-Edit View
             div[0].innerHTML = invoiceData.service[i].service_date.toDateString();
-            div[1].innerHTML = invoiceData.service[i].lineNumber;
+            div[1].innerHTML = invoiceData.service[i].line_number;
             div[2].innerHTML = invoiceData.service[i].description;
             div[3].innerHTML =
                 invoiceData.service[i].km + "km @ " + invoiceData.service[i].km_rate + " per km";

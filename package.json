@@ -1,11 +1,12 @@
 {
   "name": "InvoiceApp",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "private": true,
   "scripts": {
-    "build": "webpack --config webpack.config.js",
     "start": "node --env-file .env ./bin/www",
-    "devstart": "nodemon --exec \"npm run build && npm run start\" -e js --ignore lib/"
+    "devstart": "nodemon --exec \"npm run build && npm run start\" -e js --ignore lib/",
+    "build": "webpack",
+    "getKM": "node --env-file .env ./src/test/TaxTime.js"
   },
   "dependencies": {
     "cookie-parser": "~1.4.4",

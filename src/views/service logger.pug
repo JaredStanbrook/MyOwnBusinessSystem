@@ -1,0 +1,14 @@
+extends layout
+block content
+  link(rel='stylesheet', href='/stylesheets/standardstyle.css')
+  script(src='/javascripts/built.js')
+  .offpage(data-html2canvas-ignore="true")
+    button(type='button')#form-btn Form
+    button(type='button')#pallette-btn Dark!
+    
+  .page
+    .panel
+      .panel-heading
+        h3.panel-title Service Logger
+      #service-form
+      <form name="service-form">

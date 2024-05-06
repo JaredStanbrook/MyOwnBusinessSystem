@@ -1,7 +1,6 @@
-node_modules
-.vscode
 webpack.config.js
 populatedb.js
 README.md
-.gitignore
-private
+/private/
+#!include:.gitignore
+/node_modules/
