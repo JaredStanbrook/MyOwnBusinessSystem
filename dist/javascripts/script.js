@@ -28,13 +28,13 @@ var edit = false;
 
 const form_configs = { "service-form": 1, client: 2 };
 
-const form_feild_configs = [
+const form_field_configs = [
     {
         form_config_id: 1,
         name: "item_number",
         label: "Item Number",
         field_type: "input",
-        feild_value_type: "number",
+        field_value_type: "number",
         options: null,
         position: 2,
         required: true,
@@ -44,141 +44,154 @@ const form_feild_configs = [
         name: "item_name",
         label: "Item Name",
         field_type: "select",
-        feild_value_type: null,
+        field_value_type: null,
         options: ["Yes", "No"],
         position: 1,
         required: true,
     },
 ];
-const table_configs = { 1: { title: "edit" }, 2: { title: "ndis" } };
+const table_configs = {
+    1: { title: "edit", data: "service" },
+    2: { title: "ndis", data: "service" },
+};
 
-const table_feild_configs = [
+const table_field_configs = [
     {
-        form_config_id: 1,
+        table_config_id: 1,
         name: "service_date",
         label: "Service Date",
         field_type: "input",
-        feild_value_type: "number",
+        field_value_type: "date",
         options: null,
         position: 1,
         required: true,
     },
     {
-        form_config_id: 1,
-        name: "description",
-        label: "Description",
+        table_config_id: 1,
+        name: "line_number",
+        label: "Line Number",
         field_type: "input",
-        feild_value_type: "number",
+        field_value_type: "number",
         options: null,
         position: 2,
         required: true,
     },
     {
-        form_config_id: 1,
-        name: "km",
-        label: "KM",
+        table_config_id: 1,
+        name: "description",
+        label: "Description",
         field_type: "input",
-        feild_value_type: "number",
+        field_value_type: "number",
         options: null,
         position: 3,
         required: true,
     },
     {
-        form_config_id: 1,
-        name: "km_rate",
-        label: "Rate(KM)",
+        table_config_id: 1,
+        name: "km",
+        label: "KM",
         field_type: "input",
-        feild_value_type: "number",
+        field_value_type: "number",
         options: null,
         position: 4,
         required: true,
     },
     {
-        form_config_id: 1,
-        name: "hour",
-        label: "Hours",
+        table_config_id: 1,
+        name: "km_rate",
+        label: "Rate(KM)",
         field_type: "input",
-        feild_value_type: "number",
+        field_value_type: "number",
         options: null,
         position: 5,
         required: true,
     },
     {
-        form_config_id: 1,
-        name: "hour_rate",
-        label: "Rate(Hours)",
+        table_config_id: 1,
+        name: "hour",
+        label: "Hours",
         field_type: "input",
-        feild_value_type: "number",
+        field_value_type: "number",
         options: null,
         position: 6,
         required: true,
     },
     {
-        form_config_id: 1,
-        name: "ammount",
-        label: "Ammount",
-        field_type: "total",
-        feild_value_type: "number",
+        table_config_id: 1,
+        name: "hour_rate",
+        label: "Rate(Hours)",
+        field_type: "input",
+        field_value_type: "number",
         options: null,
         position: 7,
         required: true,
     },
     {
-        form_config_id: 2,
+        table_config_id: 1,
+        name: "ammount",
+        label: "Ammount",
+        field_type: "total",
+        field_value_type: "number",
+        options: null,
+        position: 8,
+        required: true,
+    },
+    {
+        table_config_id: 2,
         name: "service_date",
         label: "Service Date",
         field_type: "text",
-        feild_value_type: "number",
+        field_value_type: "date",
         options: null,
         position: 1,
         required: true,
     },
     {
-        form_config_id: 2,
+        table_config_id: 2,
         name: "line_number",
         label: "Line Number",
         field_type: "text",
-        feild_value_type: "number",
+        field_value_type: "number",
         options: null,
         position: 2,
         required: true,
     },
     {
-        form_config_id: 2,
+        table_config_id: 2,
         name: "description",
         label: "Description",
-        field_type: null,
-        feild_value_type: null,
+        field_type: "text",
+        field_value_type: "number",
         options: null,
         position: 3,
         required: true,
     },
     {
-        form_config_id: 2,
-        name: "distance",
+        table_config_id: 2,
+        name: "km_rate",
         label: "Distance & Agreed Rate",
         field_type: "text",
-        feild_value_type: null,
+        field_value_type: "template",
         options: null,
         position: 4,
         required: true,
     },
     {
-        form_config_id: 2,
-        name: "duration",
+        table_config_id: 2,
+        name: "km_rate",
         label: "Duration & Agreed Rate",
         field_type: "text",
-        feild_value_type: null,
+        field_value_type: "template",
         options: null,
         position: 5,
         required: true,
     },
     {
-        form_config_id: 2,
+        table_config_id: 2,
         name: "ammount",
         label: "Ammount",
-        field_type: "total",
-        feild_value_type: null,
+        field_type: "text",
+        field_value_type: "number",
         options: null,
         position: 6,
         required: true,
@@ -344,7 +357,7 @@ function dropdown(e) {
 }
 function calculate(e) {
     var all = 0;
-    let div = document.getElementById("service").lastChild.childNodes;
+    let div = document.getElementById("service_table").lastChild.childNodes;
     for (let i = 0; i < div.length; i++) {
         let num =
             parseFloat(invoiceData.service[i].km) * parseFloat(invoiceData.service[i].km_rate) +
@@ -456,22 +469,24 @@ function editService(e) {
     //adjustInput(content, table);
     return;
 }
-function showService(e) {
+function showService(e, id) {
     e.firstChild.innerHTML = "";
     e.lastChild.innerHTML = "";
     // Non-Edit View
     let tr = document.createElement("tr");
-    for (let x = 0; x < serviceHeadings[1].length - 1; x++) {
+    const filteredObjects = table_field_configs.filter((obj) => obj.table_config_id === id);
+    filteredObjects.sort((a, b) => a.position - b.position);
+    for (let x = 0; x < filteredObjects.length; x++) {
         let th = document.createElement("th");
         th.className = "text-center";
-        th.innerHTML = serviceHeadings[1][x + 1];
+        th.innerHTML = filteredObjects[x].label;
         tr.appendChild(th);
     }
     e.firstChild.appendChild(tr);
     for (let i = 0; i < invoiceData.service.length; i++) {
         let tr = document.createElement("tr");
         tr.id = "row" + e.lastChild.childElementCount;
-        for (let z = 0; z < serviceHeadings[1].length - 1; z++) {
+        for (let z = 0; z < filteredObjects.length; z++) {
             let td = document.createElement("td");
             td.className = "text-center";
             td.addEventListener("input", calculate);
@@ -479,7 +494,7 @@ function showService(e) {
         }
         e.lastChild.appendChild(tr);
     }
-    populateService(e.lastChild);
+    populateService(e.lastChild, id);
 }
 function addService(e) {
     if (!edit || invoiceData.service.length >= 7) {
@@ -580,10 +595,32 @@ function palletteSwitch(e) {
         e.target.innerHTML = "Dark!";
     }
 }
-function populateService(e) {
+function populateService(e, id) {
+    const filteredObjects = table_field_configs.filter((obj) => obj.table_config_id === id);
+    filteredObjects.sort((a, b) => a.position - b.position);
     e = e.childNodes;
     for (let i = 0; i < e.length; i++) {
         let div = e[i].childNodes;
+        for (let j = 0; j < filteredObjects.length; j++) {
+            let value;
+            let data = invoiceData[table_configs[id].data][i];
+            if (filteredObjects[j].field_value_type == "template") {
+                value = "Template > " + data[filteredObjects[j].name];
+            }
+            if (filteredObjects[j].field_value_type == "number") {
+                value = data[filteredObjects[j].name];
+            }
+            if (filteredObjects[j].field_value_type == "date") {
+                value = data[filteredObjects[j].name].toLocaleDateString();
+            }
+            if (filteredObjects[j].field_type == "text") {
+                div[j].innerHTML = value;
+            }
+            if (filteredObjects[j].field_type == "input") {
+                div[j].innerHTML = value;
+            }
+        }
+        continue;
         if (edit) {
             //Edit View
             div[0].firstChild.value = invoiceData.service[i].service_date.toLocaleDateString();
@@ -616,16 +653,16 @@ function populateService(e) {
 }
 function editSwitch() {
     edit = !edit;
-    let service = document.getElementById("service");
+    let service = document.getElementById("service_table");
     let content = document.getElementsByClassName("content");
     if (edit) {
         TextToInput(content);
-        editService(service);
+        showService(service, 1);
     } else {
         calculate();
         collectTable(service);
         InputToText(content);
-        showService(service);
+        showService(service, 2);
     }
 }
 
@@ -697,13 +734,13 @@ async function readInvoice(id) {
     if (edit) {
         editSwitch();
     }
-    let filterField = document.getElementById("filter").value;
+    let filterfield = document.getElementById("filter").value;
     let div = await getReq({
         key: "/invoices/" + id,
         query: new URLSearchParams({
             field: ["clientName"],
             operator: ["=="],
-            value: [filterField],
+            value: [filterfield],
         }),
     });
     if (!div) {
@@ -713,7 +750,7 @@ async function readInvoice(id) {
     invoiceData = await div.file;
     invoicePath = await div.path;
     loadpage();
-    showService(document.getElementById("service"));
+    showService(document.getElementById("service_table"), 2); //Get Table Element
     calculate();
     return;
 }
@@ -794,7 +831,7 @@ async function newInvoice() {
     invoiceData = temp;
     invoicePath = [obj.path[1], "", ""];
     loadpage();
-    showService(document.getElementById("service"));
+    showService(document.getElementById("service_table"));
     calculate();
 }
 async function deleteInvoice() {
@@ -835,30 +872,30 @@ function renderForm(form) {
     let coloumn = document.createElement("dl");
     coloumn.setAttribute("class", "dl-horizontal-2 ");
 
-    const filtered_form_feild_configs = form_feild_configs.filter(
+    const filtered_form_field_configs = form_field_configs.filter(
         (x) => x.form_config_id == form_configs["service-form"]
     );
-    const sorted_form_feild_configs = filtered_form_feild_configs.sort(
+    const sorted_form_field_configs = filtered_form_field_configs.sort(
         (a, b) => a.position - b.position
     );
-    for (const item in sorted_form_feild_configs) {
+    for (const item in sorted_form_field_configs) {
         let dt = document.createElement("dt");
-        dt.innerHTML = sorted_form_feild_configs[item].label + ":";
+        dt.innerHTML = sorted_form_field_configs[item].label + ":";
         let dd = document.createElement("dd");
-        var e = document.createElement(sorted_form_feild_configs[item].field_type);
-        if (sorted_form_feild_configs[item].feild_value_type) {
-            e.setAttribute("type", sorted_form_feild_configs[item].feild_value_type);
+        var e = document.createElement(sorted_form_field_configs[item].field_type);
+        if (sorted_form_field_configs[item].field_value_type) {
+            e.setAttribute("type", sorted_form_field_configs[item].field_value_type);
         }
-        e.setAttribute("name", sorted_form_feild_configs[item].name);
-        if (sorted_form_feild_configs[item].field_type == "input") {
+        e.setAttribute("name", sorted_form_field_configs[item].name);
+        if (sorted_form_field_configs[item].field_type == "input") {
             e.setAttribute("placeholder", "Fuck Off");
-            if (sorted_form_feild_configs[item].feild_value_type == "number") {
+            if (sorted_form_field_configs[item].field_value_type == "number") {
                 e.setAttribute("placeholder", "Enter a number");
             }
         }
-        for (const key in sorted_form_feild_configs[item].options) {
+        for (const key in sorted_form_field_configs[item].options) {
             var option = document.createElement("option");
-            option.text = sorted_form_feild_configs[item].options[key];
+            option.text = sorted_form_field_configs[item].options[key];
             e.appendChild(option);
         }
         dd.appendChild(e);
