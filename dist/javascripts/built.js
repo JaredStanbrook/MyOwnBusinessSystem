@@ -882,7 +882,7 @@ async function readInvoice(id) {
     }
     invoiceData = await div.file;
     invoicePath = await div.path;
-    loadpage();
+    loadInvoice();
     showService(document.getElementById("service_table"), 2); //Get Table Element
     calculate();
     return;
@@ -963,7 +963,7 @@ async function newInvoice() {
     });
     invoiceData = temp;
     invoicePath = [obj.path[1], "", ""];
-    loadpage();
+    loadInvoice();
     showService(document.getElementById("service"));
     calculate();
 }
