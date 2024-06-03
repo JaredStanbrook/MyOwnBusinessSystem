@@ -712,12 +712,12 @@ async function readInvoice(id) {
     }
     invoiceData = await div.file;
     invoicePath = await div.path;
-    loadpage();
+    loadInvoice();
     showService(document.getElementById("service"));
     calculate();
     return;
 }
-function loadpage() {
+function loadInvoice() {
     if (!invoiceData) {
         return;
     }
@@ -793,7 +793,7 @@ async function newInvoice() {
     });
     invoiceData = temp;
     invoicePath = [obj.path[1], "", ""];
-    loadpage();
+    loadInvoice();
     showService(document.getElementById("service"));
     calculate();
 }

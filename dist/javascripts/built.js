@@ -136,22 +136,18 @@ __webpack_require__.r(__webpack_exports__);
 
 
 document.addEventListener("DOMContentLoaded", function (event) {
-    try {
-        invoicePath = document.getElementsByClassName("onload")[0].innerHTML.split(",");
-        currentInvoice();
-        document.getElementById("status-btn").addEventListener("click", statusSwitch, false);
-        document.getElementById("type-btn").addEventListener("click", typesSwitch, false);
-        document.getElementById("download-btn").addEventListener("click", downloadInvoice, false);
-        document.getElementById("new-btn").addEventListener("click", newInvoice, false);
-        document.getElementById("delete-btn").addEventListener("click", deleteInvoice, false);
-        document.getElementById("save-btn").addEventListener("click", saveInvoice, false);
-        document.getElementById("previous-btn").addEventListener("click", previousInvoice, false);
-        document.getElementById("next-btn").addEventListener("click", nextInvoice, false);
-        document.getElementById("edit-btn").addEventListener("click", editSwitch, false);
-        document.getElementById("pallette-btn").addEventListener("click", palletteSwitch, false);
-    } catch (error) {
-        console.log("Probably not an invoice, need to serparate invoice code from standard code!");
-    }
+    invoicePath = document.getElementsByClassName("onload")[0].innerHTML.split(",");
+    currentInvoice();
+    document.getElementById("status-btn").addEventListener("click", statusSwitch, false);
+    document.getElementById("type-btn").addEventListener("click", typesSwitch, false);
+    document.getElementById("download-btn").addEventListener("click", downloadInvoice, false);
+    document.getElementById("new-btn").addEventListener("click", newInvoice, false);
+    document.getElementById("delete-btn").addEventListener("click", deleteInvoice, false);
+    document.getElementById("save-btn").addEventListener("click", saveInvoice, false);
+    document.getElementById("previous-btn").addEventListener("click", previousInvoice, false);
+    document.getElementById("next-btn").addEventListener("click", nextInvoice, false);
+    document.getElementById("edit-btn").addEventListener("click", editSwitch, false);
+    document.getElementById("pallette-btn").addEventListener("click", palletteSwitch, false);
     document.getElementById("form-btn").addEventListener("click", formOpen, false);
     document.getElementById("myNavclose-btn").addEventListener("click", formClose, false);
     document.getElementById("formSubmit-btn").addEventListener("click", formSubmit, false);
@@ -842,7 +838,7 @@ async function readInvoice(id) {
             operator: ["=="],
             value: [filterField],
         }),
-    }); //invoice0001 example getReq("invoice", [["key", key],["field", ["clientName"]],["operator", ["=="]],["value", [filterField]],]);
+    });
     if (!div) {
         console.log("Error!");
         return;
