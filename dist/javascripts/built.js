@@ -887,7 +887,7 @@ async function readInvoice(id) {
     calculate();
     return;
 }
-function loadpage() {
+function loadInvoice() {
     if (!invoiceData) {
         return;
     }
@@ -964,7 +964,7 @@ async function newInvoice() {
     invoiceData = temp;
     invoicePath = [obj.path[1], "", ""];
     loadpage();
-    showService(document.getElementById("service_table"));
+    showService(document.getElementById("service"));
     calculate();
 }
 async function deleteInvoice() {
