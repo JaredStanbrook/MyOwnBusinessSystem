@@ -41,7 +41,7 @@ router.get("/:clientId/invoices", function (req, res) {
     })();
 });
 router.get("/:clientId/latest", function (req, res) {
-    //return latest invoices for client
+    //return all invoices for client
     let id = req.params.clientId;
     (async function () {
         let file = folder.deepCopy(
