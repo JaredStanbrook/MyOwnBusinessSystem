@@ -23,5 +23,11 @@
     "nodemon": "^3.0.1",
     "webpack": "^5.90.3",
     "webpack-cli": "^5.1.4"
+  },
+  "standard": {
+    "ignore": [
+      "/dist/javascripts/built.js",
+      "app.yaml"
+    ]
   }
 }

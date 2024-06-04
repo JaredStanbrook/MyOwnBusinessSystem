@@ -10,6 +10,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   capitalizeFirstLetter: () => (/* binding */ capitalizeFirstLetter),
 /* harmony export */   deepCopy: () => (/* binding */ deepCopy),
 /* harmony export */   extractNum: () => (/* binding */ extractNum),
+/* harmony export */   findAncestor: () => (/* binding */ findAncestor),
 /* harmony export */   indexArray: () => (/* binding */ indexArray),
 /* harmony export */   isNull: () => (/* binding */ isNull),
 /* harmony export */   isObject: () => (/* binding */ isObject),
@@ -63,11 +64,14 @@ function capitalizeFirstLetter(string) {
 }
 function parseDMY(s) {
     var b = s.split(/\D+/);
-    var d = new Date(b[2], b[1]-1, b[0]);
+    var d = new Date(b[2], b[1] - 1, b[0]);
     d.setFullYear(b[2]);
-    return d && d.getMonth() == b[1]-1? d : new Date(NaN);
-  }
-
+    return d && d.getMonth() == b[1] - 1 ? d : new Date(NaN);
+}
+function findAncestor(el, sel) {
+    while ((el = el.parentElement) && !(el.matches || el.matchesSelector).call(el, sel));
+    return el;
+}
 
 /***/ })
 /******/ 	]);
@@ -137,6 +141,14 @@ __webpack_require__.r(__webpack_exports__);
 
 document.addEventListener("DOMContentLoaded", function (event) {
     invoicePath = document.getElementsByClassName("onload")[0].innerHTML.split(",");
+    (async function () {
+        config = await getReq({
+            key: "/invoices/config",
+            query: new URLSearchParams({}),
+        });
+    })();
+    //Init Config Files
+
     currentInvoice();
     document.getElementById("status-btn").addEventListener("click", statusSwitch, false);
     document.getElementById("type-btn").addEventListener("click", typesSwitch, false);
@@ -154,242 +166,12 @@ document.addEventListener("DOMContentLoaded", function (event) {
     //document.getElementById("filter").addEventListener("input", filter, false);
 });
 
-const BASE_URL = "http://localhost:80/mobs";
+const BASE_URL = window.location.href;
+var config;
 var invoiceData;
 var invoicePath;
 var edit = false;
 
-const form_configs = { "service-form": 1, client: 2 };
-
-const form_field_configs = [
-    {
-        form_config_id: 1,
-        name: "item_number",
-        label: "Item Number",
-        field_type: "input",
-        field_value_type: "number",
-        options: null,
-        position: 2,
-        required: true,
-    },
-    {
-        form_config_id: 1,
-        name: "item_name",
-        label: "Item Name",
-        field_type: "select",
-        field_value_type: null,
-        options: ["Yes", "No"],
-        position: 1,
-        required: true,
-    },
-];
-const table_configs = {
-    1: { title: "edit", data: "service" },
-    2: { title: "ndis", data: "service" },
-};
-
-const table_field_configs = [
-    {
-        table_config_id: 1,
-        name: "service_date",
-        label: "Service Date",
-        field_type: "input",
-        field_value_type: "date",
-        options: null,
-        position: 1,
-        required: true,
-    },
-    {
-        table_config_id: 1,
-        name: "line_number",
-        label: "Line Number",
-        field_type: "input",
-        field_value_type: "number",
-        options: null,
-        position: 2,
-        required: true,
-    },
-    {
-        table_config_id: 1,
-        name: "description",
-        label: "Description",
-        field_type: "input",
-        field_value_type: "number",
-        options: null,
-        position: 3,
-        required: true,
-    },
-    {
-        table_config_id: 1,
-        name: "km",
-        label: "KM",
-        field_type: "input",
-        field_value_type: "number",
-        options: null,
-        position: 4,
-        required: true,
-    },
-    {
-        table_config_id: 1,
-        name: "km_rate",
-        label: "Rate(KM)",
-        field_type: "input",
-        field_value_type: "number",
-        options: null,
-        position: 5,
-        required: true,
-    },
-    {
-        table_config_id: 1,
-        name: "hour",
-        label: "Hours",
-        field_type: "input",
-        field_value_type: "number",
-        options: null,
-        position: 6,
-        required: true,
-    },
-    {
-        table_config_id: 1,
-        name: "hour_rate",
-        label: "Rate(Hours)",
-        field_type: "input",
-        field_value_type: "number",
-        options: null,
-        position: 7,
-        required: true,
-    },
-    {
-        table_config_id: 1,
-        name: "ammount",
-        label: "Ammount",
-        field_type: "total",
-        field_value_type: "number",
-        options: null,
-        position: 8,
-        required: true,
-    },
-    {
-        table_config_id: 2,
-        name: "service_date",
-        label: "Service Date",
-        field_type: "text",
-        field_value_type: "date",
-        options: null,
-        position: 1,
-        required: true,
-    },
-    {
-        table_config_id: 2,
-        name: "line_number",
-        label: "Line Number",
-        field_type: "text",
-        field_value_type: "number",
-        options: null,
-        position: 2,
-        required: true,
-    },
-    {
-        table_config_id: 2,
-        name: "description",
-        label: "Description",
-        field_type: "text",
-        field_value_type: "number",
-        options: null,
-        position: 3,
-        required: true,
-    },
-    {
-        table_config_id: 2,
-        name: "km_rate",
-        label: "Distance & Agreed Rate",
-        field_type: "text",
-        field_value_type: "template",
-        options: null,
-        position: 4,
-        required: true,
-    },
-    {
-        table_config_id: 2,
-        name: "km_rate",
-        label: "Duration & Agreed Rate",
-        field_type: "text",
-        field_value_type: "template",
-        options: null,
-        position: 5,
-        required: true,
-    },
-    {
-        table_config_id: 2,
-        name: "ammount",
-        label: "Ammount",
-        field_type: "text",
-        field_value_type: "number",
-        options: null,
-        position: 6,
-        required: true,
-    },
-];
-const serviceHeadings = [
-    [
-        "edit",
-        "Service Date",
-        "Line Number",
-        "Description",
-        "KM",
-        "Rate(KM)",
-        "Hours",
-        "Rate(Hours)",
-        "Ammount",
-    ],
-    [
-        "ndis",
-        "Service Date",
-        "Line Number",
-        "Description",
-        "Distance & Agreed Rate",
-        "Duration & Agreed Rate",
-        "Ammount",
-    ],
-];
-const emptyService = {
-    service_date: new Date("2024-01-01T16:00:00.000Z"),
-    line_number: "",
-    description: "",
-    km: 0,
-    km_rate: 0.85,
-    hour: 0,
-    hour_rate: 50,
-};
-const emptyInvoice = {
-    invoice_id: "",
-    invoice_type: "abn",
-    date: "2024-01-31T16:00:00.000Z",
-    client_id: "",
-    client_fullname: "Kerry Hickman",
-    client_address: "PO BOX 25 Bentley WA 6982 Australia",
-    client_number: "12345444",
-    user_fullname: "Jared Stanbrook",
-    user_bsb: "036087",
-    user_account: "886813",
-    user_bank: "Westpac Banking Corporation",
-    user_abn: "62385109727",
-    user_phone: "0418 407 644",
-    user_email: "Jared.Stanbrook@outlook.com",
-    user_address: "19 Hopkins Pl, Waikiki WA 6169",
-    service: [
-        {
-            service_date: "2024-01-01T16:00:00.000Z",
-            line_number: "",
-            description: "Assistance with Social and Community Event",
-            km: 0,
-            km_rate: 0.85,
-            hour: 0,
-            hour_rate: 50,
-        },
-    ],
-    status: "incomplete",
-};
 async function getReq(params = {}) {
     if (_utils__WEBPACK_IMPORTED_MODULE_0__.isObjectEmpty(params.query) || !_utils__WEBPACK_IMPORTED_MODULE_0__.isString(params.key)) {
         console.log("Type Error");
@@ -485,26 +267,6 @@ async function deleteReq(params = {}) {
     }
 }
 
-function dropdown(e) {
-    e.parentNode.parentNode.firstChild.value = e.innerHTML;
-}
-function calculate(e) {
-    var all = 0;
-    let div = document.getElementById("service_table").lastChild.childNodes;
-    for (let i = 0; i < div.length; i++) {
-        let num =
-            parseFloat(invoiceData.service[i].km) * parseFloat(invoiceData.service[i].km_rate) +
-            parseFloat(invoiceData.service[i].hour) * parseFloat(invoiceData.service[i].hour_rate);
-        if (edit) {
-            div[i].childNodes[7].innerHTML = "$".concat(num.toFixed(2));
-        } else if (!edit) {
-            div[i].lastChild.innerHTML = "$".concat(num.toFixed(2));
-        }
-        all += Math.round((num + Number.EPSILON) * 100) / 100;
-    }
-    document.getElementById("total").innerHTML = "$".concat(all.toFixed(2));
-}
-
 function downloadInvoice() {
     if (edit) {
         editSwitch();
@@ -530,149 +292,176 @@ function downloadInvoice() {
     };
     html2pdf().set(opt).from(element).save();
 }
-function adjustInput(list, table) {
-    for (let i = 0; i < list.length; i++) {
-        list[i].firstChild.style.height = list[i].firstChild.scrollHeight + "px";
-        if (list[i].closest("div").classList.contains("title")) {
-            list[i].firstChild.style.width = list[i].firstChild.value.length + "ch";
-            list[i].firstChild.style.height = "22px";
-        }
-    }
-    for (let i = 0; i < table.length; i++) {
-        table[i].style.width = table[i].value.length + "ch";
-        table[i].style.height = table[i].scrollHeight + "px";
-    }
+function adjustInput(e) {
+    e.style.height = "auto";
+    e.style.height = e.scrollHeight + "px";
 }
-function editService(e) {
-    //Edit View
-    //Service Headings
-    e.firstChild.innerHTML = "";
-    e.lastChild.innerHTML = "";
-    let tr = document.createElement("tr");
-    for (let x = 0; x < serviceHeadings[0].length - 1; x++) {
-        let th = document.createElement("th");
-        th.className = "text-center";
-        th.innerHTML = serviceHeadings[0][x + 1];
-        tr.appendChild(th);
-    }
-    e.firstChild.appendChild(tr);
-    let template = [
-        "service_date",
-        "line_number",
-        "description",
-        "km",
-        "km_rate",
-        "hour",
-        "hour_rate",
-    ];
-    //Service Table
-    let table = [];
-    for (let i = 0; i < invoiceData.service.length; i++) {
-        let tr = document.createElement("tr");
-        tr.id = "row" + e.lastChild.childElementCount;
-        for (let z = 0; z < serviceHeadings[0].length - 1; z++) {
-            //here for future
-            let td = document.createElement("td");
-            td.className = "text-center";
-            if (z < serviceHeadings[0].length - 2) {
-                td.id = template[z];
-            }
-            td.addEventListener("input", calculate);
-            tr.appendChild(td);
-            let text = document.createElement("textarea");
-            text.className = "input";
-            td.appendChild(text);
-            table.push(text);
-        }
-        e.lastChild.appendChild(tr);
-    }
-    //Add + and - Buttons
-    let child = e.lastChild.childNodes;
-    for (let i = 0; i < child.length; i++) {
-        let button1 = document.createElement("button");
-        button1.innerHTML = "+";
-        button1.addEventListener("click", addService);
-        child[i].appendChild(button1);
-        let button2 = document.createElement("button");
-        button2.innerHTML = "-";
-        button2.addEventListener("click", deleteService);
-        child[i].appendChild(button2);
-    }
-    populateService(e.lastChild);
-    //adjustInput(content, table);
-    return;
-}
-function showService(e, id) {
-    e.firstChild.innerHTML = "";
-    e.lastChild.innerHTML = "";
-    // Non-Edit View
-    let tr = document.createElement("tr");
-    const filteredObjects = table_field_configs.filter((obj) => obj.table_config_id === id);
+function populateTable(e, id) {
+    const filteredObjects = config.table_field_configs.filter(
+        (obj) => obj.table_config_id === id && obj.field_type != "button"
+    );
     filteredObjects.sort((a, b) => a.position - b.position);
+    let target = e.lastChild.childNodes;
+    for (let i = 0; i < target.length; i++) {
+        let div = target[i].childNodes;
+        for (let j = 0; j < filteredObjects.length; j++) {
+            let value;
+            let data = invoiceData[config.table_configs[id].data][i];
+            switch (filteredObjects[j].field_value_type) {
+                case "template":
+                    switch (filteredObjects[j].name) {
+                        case "km":
+                            value = data.km + "km @ " + data.km_rate + " per km";
+                            break;
+                        case "hour":
+                            value = data.hour + " hours @ " + data.hour_rate + " per hour";
+                            break;
+                        default:
+                            value = "Unknown Template!";
+                    }
+                    break;
+                case "number":
+                    value = data[filteredObjects[j].name];
+                    break;
+                case "date":
+                    //Check that date is date object!
+                    if (typeof data[filteredObjects[j].name] == "string") {
+                        data[filteredObjects[j].name] = _utils__WEBPACK_IMPORTED_MODULE_0__.parseDMY(
+                            data[filteredObjects[j].name]
+                        );
+                    }
+                    value = data[filteredObjects[j].name].toLocaleDateString();
+                    break;
+                case "text":
+                    div[j].innerHTML = value;
+                    break;
+                default:
+                    value = "Unknown Field Value Type! = " + filteredObjects[j].field_value_type;
+            }
+            if (filteredObjects[j].field_type == "text") {
+                div[j].innerHTML = value;
+            }
+            if (filteredObjects[j].field_type == "input") {
+                div[j].firstChild.value = value;
+                div[j].firstChild.setAttribute(
+                    "style",
+                    "height:" + div[j].firstChild.scrollHeight + "px;overflow-y:hidden;"
+                );
+            }
+        }
+    }
+    calculateTable(e, id);
+}
+function renderTable(e, id) {
+    //Clear Old Table
+    e.innerHTML = "";
+    //Prepare Table Structure
+    let thead = document.createElement("thead");
+    let tbody = document.createElement("tbody");
+    //Collect, Filter, and Sort Data for table
+    const filteredObjects = config.table_field_configs.filter(
+        (obj) => obj.table_config_id === id && obj.field_type != "button"
+    );
+    filteredObjects.sort((a, b) => a.position - b.position);
+    const buttonObjects = config.table_field_configs.filter(
+        (obj) => obj.table_config_id === id && obj.field_type === "button"
+    );
+    buttonObjects.sort((a, b) => a.position - b.position);
+    //Generate Heading of Table
+    let heading = document.createElement("tr");
     for (let x = 0; x < filteredObjects.length; x++) {
         let th = document.createElement("th");
         th.className = "text-center";
         th.innerHTML = filteredObjects[x].label;
-        tr.appendChild(th);
+        heading.appendChild(th);
     }
-    e.firstChild.appendChild(tr);
-    for (let i = 0; i < invoiceData.service.length; i++) {
-        let tr = document.createElement("tr");
-        tr.id = "row" + e.lastChild.childElementCount;
-        for (let z = 0; z < filteredObjects.length; z++) {
-            let td = document.createElement("td");
-            td.className = "text-center";
-            td.addEventListener("input", calculate);
-            tr.appendChild(td);
-        }
-        e.lastChild.appendChild(tr);
-    }
-    populateService(e.lastChild, id);
-}
-function addService(e) {
-    if (!edit || invoiceData.service.length >= 7) {
-        return;
-    }
-    e = e.target;
-    let tr = document.createElement("tr");
-    for (let z = 0; z < serviceHeadings[0].length - 1; z++) {
+    thead.appendChild(heading);
+    e.appendChild(thead);
+
+    //Generate Body of Table
+    let row = document.createElement("tr");
+    for (let z = 0; z < filteredObjects.length; z++) {
         let td = document.createElement("td");
         td.className = "text-center";
-        let text = document.createElement("textarea");
-        td.appendChild(text);
-        td.addEventListener("input", calculate);
-        tr.appendChild(td);
+        if (filteredObjects[z].field_type == "input") {
+            let text = document.createElement("textarea");
+            text.id = filteredObjects[z].name;
+            text.className = "input";
+            td.appendChild(text);
+        }
+        row.appendChild(td);
     }
-    let button1 = document.createElement("button");
-    button1.innerHTML = "+";
-    button1.addEventListener("click", addService);
-    tr.appendChild(button1);
-    let button2 = document.createElement("button");
-    button2.innerHTML = "-";
-    button2.addEventListener("click", deleteService);
-    tr.appendChild(button2);
-    e.parentElement.parentNode.insertBefore(tr, e.parentElement.nextSibling);
-    let nodes = e.parentNode.parentNode.childNodes;
-    for (let i = 0; i < nodes.length; i++) {
-        nodes[i].id = "row" + i;
+    if (buttonObjects.length) {
+        for (let x = 0; x < buttonObjects.length; x++) {
+            let button = document.createElement("button");
+            button.id = buttonObjects[x].name;
+            button.innerHTML = buttonObjects[x].label;
+            row.appendChild(button);
+        }
     }
-    invoiceData.service.splice(parseInt(e.parentNode.id.slice(-1)) + 1, 0, {
-        service_date: new Date("2024-01-01T16:00:00.000Z"),
-        description: "Daily Personal Activities - Weekday Daytime",
-        km: 0.0,
-        km_rate: 0.0,
-        hour: 0.0,
-        hour_rate: 50,
-        total: 0.0,
+    //Make Clone of Row for total ammount of entries
+    for (let i = 0; i < invoiceData.service.length; i++) {
+        let clone = row.cloneNode(true);
+        clone.id = i;
+        tbody.appendChild(clone);
+    }
+    //Update InvoiceData and Calculate new total on every input
+    tbody.addEventListener("input", (event) => {
+        invoiceData.service[_utils__WEBPACK_IMPORTED_MODULE_0__.findAncestor(event.target, "tr").id][event.target.id] =
+            event.target.value;
+        adjustInput(event.target);
+        calculateTable(e, id);
     });
-    populateService(e.parentNode.parentNode);
+    //Set Event Listner to only the buttons
+    tbody.getElementsByTagName("button").forEach(function (elem) {
+        elem.addEventListener("click", (event) => {
+            let row_n = parseInt(event.target.parentNode.id);
+            switch (event.target.id) {
+                case "add_row":
+                    console.log("Add Row!");
+                    addRow(e, id, row_n);
+                    break;
+                case "remove_row":
+                    console.log("Remove Row!");
+                    deleteRow(e, id, row_n);
+                    break;
+                default:
+                    console.log("Unknown Button!");
+            }
+        });
+    });
+    e.appendChild(tbody);
+    populateTable(e, id);
 }
-function deleteService(e) {
-    if (invoiceData.service.length > 1) {
-        e = e.target;
-        invoiceData.service.splice(parseInt(e.parentNode.id.slice(-1)), 1);
-        e.parentElement.remove();
+function calculateTable(e, id) {
+    const filteredObjects = config.table_field_configs.filter(
+        (obj) => obj.table_config_id === id && obj.field_type === "total"
+    );
+    var all = 0;
+    let div = e.lastChild.childNodes;
+    for (let i = 0; i < div.length; i++) {
+        let num =
+            parseFloat(invoiceData.service[i].km) * parseFloat(invoiceData.service[i].km_rate) +
+            parseFloat(invoiceData.service[i].hour) * parseFloat(invoiceData.service[i].hour_rate);
+
+        div[i].childNodes[filteredObjects[0].position - 1].innerHTML = "$".concat(num.toFixed(2));
+        all += Math.round((num + Number.EPSILON) * 100) / 100;
     }
+    document.getElementById("total").innerHTML = "$".concat(all.toFixed(2));
+}
+function addRow(e, id, num) {
+    if (invoiceData.service.length >= 7) {
+        return;
+    }
+    invoiceData.service.splice(num + 1, 0, config.emptyService);
+    renderTable(e, id);
+}
+function deleteRow(e, id, num) {
+    if (invoiceData.service.length < 1) {
+        return;
+    }
+    invoiceData.service.splice(num, 1);
+    renderTable(e, id);
 }
 function statusSwitch() {
     if (!this.innerHTML) {
@@ -728,74 +517,18 @@ function palletteSwitch(e) {
         e.target.innerHTML = "Dark!";
     }
 }
-function populateService(e, id) {
-    const filteredObjects = table_field_configs.filter((obj) => obj.table_config_id === id);
-    filteredObjects.sort((a, b) => a.position - b.position);
-    e = e.childNodes;
-    for (let i = 0; i < e.length; i++) {
-        let div = e[i].childNodes;
-        for (let j = 0; j < filteredObjects.length; j++) {
-            let value;
-            let data = invoiceData[table_configs[id].data][i];
-            if (filteredObjects[j].field_value_type == "template") {
-                value = "Template > " + data[filteredObjects[j].name];
-            }
-            if (filteredObjects[j].field_value_type == "number") {
-                value = data[filteredObjects[j].name];
-            }
-            if (filteredObjects[j].field_value_type == "date") {
-                value = data[filteredObjects[j].name].toLocaleDateString();
-            }
-            if (filteredObjects[j].field_type == "text") {
-                div[j].innerHTML = value;
-            }
-            if (filteredObjects[j].field_type == "input") {
-                div[j].innerHTML = value;
-            }
-        }
-        continue;
-        if (edit) {
-            //Edit View
-            div[0].firstChild.value = invoiceData.service[i].service_date.toLocaleDateString();
-            div[1].firstChild.value = invoiceData.service[i].line_number;
-            div[2].firstChild.value = invoiceData.service[i].description;
-            div[3].firstChild.value = invoiceData.service[i].km;
-            div[4].firstChild.value = invoiceData.service[i].km_rate;
-            div[5].firstChild.value = invoiceData.service[i].hour;
-            div[6].firstChild.value = invoiceData.service[i].hour_rate;
-            //div[6].firstChild.value = invoiceData.service[i].total;
-        } else if (!edit) {
-            //Non-Edit View
-            div[0].innerHTML = invoiceData.service[i].service_date.toDateString();
-            div[1].innerHTML = invoiceData.service[i].line_number;
-            div[2].innerHTML = invoiceData.service[i].description;
-            div[3].innerHTML =
-                invoiceData.service[i].km + "km @ " + invoiceData.service[i].km_rate + " per km";
-            div[4].innerHTML =
-                invoiceData.service[i].hour +
-                " hours @ " +
-                invoiceData.service[i].hour_rate +
-                " per hour";
-            //div[3].innerHTML = invoiceData.service[i].kmRate;
-            //div[4].innerHTML = invoiceData.service[i].hours; //None
-            //div[5].innerHTML = invoiceData.service[i].hoursRate;
-            //div[6].innerHTML = invoiceData.service[i].total;
-        }
-    }
-    calculate();
-}
 function editSwitch() {
     edit = !edit;
     let service = document.getElementById("service_table");
     let content = document.getElementsByClassName("content");
     if (edit) {
         TextToInput(content);
-        showService(service, 1);
+        renderTable(service, 1);
     } else {
-        calculate();
+        calculateTable(service, 2);
         collectTable(service);
         InputToText(content);
-        showService(service, 2);
+        renderTable(service, 2);
     }
 }
 
@@ -818,7 +551,7 @@ function InputToText(content) {
             let t = content[i].lastChild.value;
             content[i].innerHTML = t;
             if (content[i].id == "date") {
-                t = _utils__WEBPACK_IMPORTED_MODULE_0__.parseDMY(t); //utils.parseDMY(t) t.toDateString()
+                t = _utils__WEBPACK_IMPORTED_MODULE_0__.parseDMY(t);
                 content[i].innerHTML = t.toDateString();
             }
             invoiceData[content[i].id] = t;
@@ -826,7 +559,6 @@ function InputToText(content) {
     }
 }
 function TextToInput(content) {
-    //let dropdown = { "client-name": ["Seth Smith", "Chantelle Smith"] };
     for (let i = 0; i < content.length; i++) {
         if (content[i].childElementCount < 1) {
             var text = document.createElement("textarea");
@@ -836,26 +568,6 @@ function TextToInput(content) {
                 text.value = invoiceData[content[i].id].toLocaleDateString();
             }
             content[i].innerHTML = "";
-            /*
-            if (dropdown[content[i].id] != undefined) {
-                text.className = "dropbtn";
-                text.addEventListener("click", function (event) {
-                    document.getElementById("myDropdown").classList.toggle("show");
-                });
-                let div = document.createElement("div");
-                div.id = "myDropdown";
-                div.className = "dropdown-content";
-                for (let x = 0; x < dropdown[content[i].id].length; x++) {
-                    a = document.createElement("a");
-                    a.innerHTML = dropdown[content[i].id][x];
-                    div.appendChild(a);
-                    a.onclick = function (event) {
-                        event.target.parentNode.parentNode.lastChild.value = event.target.innerHTML;
-                    };
-                }
-                content[i].appendChild(div);
-            }
-            */
             content[i].appendChild(text);
         }
     }
@@ -875,7 +587,7 @@ async function readInvoice(id) {
             operator: ["=="],
             value: [filterfield],
         }),
-    });
+    }); //invoice0001 example getReq("invoice", [["key", key],["field", ["clientName"]],["operator", ["=="]],["value", [filterField]],]);
     if (!div) {
         console.log("Error!");
         return;
@@ -883,14 +595,16 @@ async function readInvoice(id) {
     invoiceData = await div.file;
     invoicePath = await div.path;
     loadInvoice();
-    showService(document.getElementById("service_table"), 2); //Get Table Element
-    calculate();
+    renderTable(document.getElementById("service_table"), 2); //Get Table Element
+    calculateTable(document.getElementById("service_table"), 2);
     return;
 }
 function loadInvoice() {
     if (!invoiceData) {
         return;
     }
+    //TODO Move Invoice Data Sterilaztion into Invoice Data fetching function! ->
+
     //Adjust InvoiceData Service Data Variable to be in Date Format, Before going further.
     invoiceData.date = new Date(invoiceData.date);
     for (const i in invoiceData.service) {
@@ -908,17 +622,21 @@ function loadInvoice() {
     document.getElementById("status-btn").innerHTML = _utils__WEBPACK_IMPORTED_MODULE_0__.capitalizeFirstLetter(
         invoiceData.status
     );
-
+    // All Apart of the sterilization! <-
     let temp = _utils__WEBPACK_IMPORTED_MODULE_0__.deepCopy(invoiceData); //makes duplicate of invoiceData
     delete temp["service"];
-    for (const key in temp) {
-        if (temp.hasOwnProperty(key)) {
+    fillForm(temp);
+}
+function fillForm(dict) {
+    //TODO relating to dynamic form content field formatting, make sure each element is formated correctly.
+    for (const key in dict) {
+        if (dict.hasOwnProperty(key)) {
             let e = document.getElementById(key);
             if (e != null) {
                 if (edit) {
-                    e.firstChild.value = temp[key];
+                    e.firstChild.value = dict[key];
                 } else {
-                    e.innerHTML = temp[key];
+                    e.innerHTML = dict[key];
                     if (e.id == "date") {
                         e.innerHTML = invoiceData.date.toDateString();
                     }
@@ -947,7 +665,7 @@ async function newInvoice() {
         key: "/clients/" + invoiceData.client_fullname + "/latest",
         query: new URLSearchParams({}),
     });
-    let temp = _utils__WEBPACK_IMPORTED_MODULE_0__.deepCopy(emptyInvoice);
+    let temp = _utils__WEBPACK_IMPORTED_MODULE_0__.deepCopy(config.emptyInvoice);
     temp.invoice_id =
         obj.file.client_fullname.replace(/\s+/g, "") +
         (parseInt(_utils__WEBPACK_IMPORTED_MODULE_0__.extractNum(obj.file.invoice_id)) + 1);
@@ -956,16 +674,20 @@ async function newInvoice() {
     temp.client_fullname = obj.file.client_fullname;
     temp.client_address = obj.file.client_address;
     temp.client_number = obj.file.client_number;
-    await postReq({
+    let res = await postReq({
         data: temp,
-        key: "/invoices/" + temp.invoice_id,
-        query: new URLSearchParams({}),
+        key: "/invoices",
+        query: new URLSearchParams({
+            path: true,
+        }),
     });
+    //TODO ADD ERROR CHECKING
+    temp._id = res.path[1];
     invoiceData = temp;
-    invoicePath = [obj.path[1], "", ""];
+    invoicePath = res.path;
     loadInvoice();
-    showService(document.getElementById("service"));
-    calculate();
+    renderTable(document.getElementById("service_table"), 2);
+    calculateTable(document.getElementById("service_table"), 2);
 }
 async function deleteInvoice() {
     let div = await deleteReq({
@@ -1005,8 +727,8 @@ function renderForm(form) {
     let coloumn = document.createElement("dl");
     coloumn.setAttribute("class", "dl-horizontal-2 ");
 
-    const filtered_form_field_configs = form_field_configs.filter(
-        (x) => x.form_config_id == form_configs["service-form"]
+    const filtered_form_field_configs = config.form_field_configs.filter(
+        (x) => x.form_config_id == config.form_configs["service-form"]
     );
     const sorted_form_field_configs = filtered_form_field_configs.sort(
         (a, b) => a.position - b.position
@@ -1048,7 +770,7 @@ function formSubmit() {
     const params = Array.from(new FormData(form));
     const json = Object.assign(...Array.from(params, ([x, y]) => ({ [x]: y })));
 
-    let empty = _utils__WEBPACK_IMPORTED_MODULE_0__.deepCopy(emptyService);
+    let empty = _utils__WEBPACK_IMPORTED_MODULE_0__.deepCopy(config.emptyService);
     empty.description = json.item_name + " - " + json.item_level;
     empty.hour = json.end_time - json.start_time;
     empty.hour_rate = parseFloat(json.item_rate);
@@ -1056,7 +778,6 @@ function formSubmit() {
     empty.km_rate = parseFloat(json.km_rate);
     empty.line_number = json.item_number;
     empty.service_date = _utils__WEBPACK_IMPORTED_MODULE_0__.parseDMY(json.start_date);
-    console.log(empty);
 }
 window.onclick = function (event) {
     if (!event.target.matches(".dropbtn")) {

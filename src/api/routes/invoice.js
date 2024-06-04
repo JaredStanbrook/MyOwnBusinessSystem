@@ -13,6 +13,20 @@ router.use(function (req, res, next) {
     next();
 });
 
+router.get("/config", function (req, res) {
+    (async function () {
+        let fileContent = fs.readFileSync("./dist/config/config.json");
+        let config = JSON.parse(fileContent);
+        return res.status(200).json(config);
+    })();
+});
+router.get("/latest", function (req, res) {
+    (async function () {
+        return res
+            .status(200)
+            .json(folder.deepCopy(await Invoice.find({}).sort({ date: -1 }).limit(1)));
+    })();
+});
 router.post("/", function (req, res) {
     if (folder.isObjectEmpty(req.body)) {
         return res.json({
@@ -21,8 +35,24 @@ router.post("/", function (req, res) {
         });
     }
     const parcel = req.body;
+    if (!req.query.path) {
+        req.query.path = false;
+    }
 
-    return res.status(200).send({ status: "Write New Invoice" });
+    const { path } = req.query;
+    (async function () {
+        try {
+            let result = await Invoice.create(parcel);
+            let obj = { status: "Saved!" };
+            if (path) {
+                obj.path = await folder.retrievePath({ _id: result._id });
+            }
+            return res.status(200).send(obj);
+        } catch (e) {
+            res.status(401).send({ status: "No Fucking Good Mate" });
+            return console.error(e);
+        }
+    })();
 });
 router.get("/", function (req, res) {
     if (!req.query.field) {
@@ -35,9 +65,7 @@ router.get("/", function (req, res) {
         req.query.value = "";
     }
 
-    const { field } = req.query;
-    const { operator } = req.query;
-    const { value } = req.query;
+    const { field, operator, value } = req.query;
 
     (async function () {
         res.send(await folder.filter(field, operator, value));
@@ -158,13 +186,6 @@ router.delete("/:fileName", function (req, res) {
             res.status(401).send({ status: "No Fucking Good Mate" });
             return console.error(e._message);
         }
-    })();
-});
-router.get("/latest", function (req, res) {
-    (async function () {
-        return res
-            .status(200)
-            .json(folder.deepCopy(await Invoice.find({}).sort({ date: -1 }).limit(1)));
     })();
 });
 

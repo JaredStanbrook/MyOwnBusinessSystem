@@ -3,4 +3,3 @@ node_modules
 private
 .vscode
 .gcloudignore
-app.yaml

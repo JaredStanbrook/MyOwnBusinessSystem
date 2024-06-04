@@ -43,7 +43,11 @@ export function capitalizeFirstLetter(string) {
 }
 export function parseDMY(s) {
     var b = s.split(/\D+/);
-    var d = new Date(b[2], b[1]-1, b[0]);
+    var d = new Date(b[2], b[1] - 1, b[0]);
     d.setFullYear(b[2]);
-    return d && d.getMonth() == b[1]-1? d : new Date(NaN);
-  }
+    return d && d.getMonth() == b[1] - 1 ? d : new Date(NaN);
+}
+export function findAncestor(el, sel) {
+    while ((el = el.parentElement) && !(el.matches || el.matchesSelector).call(el, sel));
+    return el;
+}
