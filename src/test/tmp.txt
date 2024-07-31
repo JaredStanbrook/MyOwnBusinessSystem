@@ -1,0 +1,1 @@
+mongoexport --uri mongodb+srv://jaredstanbrook:UgoGcK7h36iBufm3@learning.dhop2vf.mongodb.net/mobs --collection invoices --out=eofy.json

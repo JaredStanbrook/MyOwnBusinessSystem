@@ -188,5 +188,24 @@ router.delete("/:fileName", function (req, res) {
         }
     })();
 });
+router.get("/services", function (req, res) {
+    if (!req.query.field) {
+        req.query.field = "clientName";
+    }
+    if (!req.query.operator) {
+        req.query.operator = "==";
+    }
+    if (!req.query.value) {
+        req.query.value = "";
+    }
 
+    const { field } = req.query;
+    const { operator } = req.query;
+    const { value } = req.query;
+
+    (async function () {
+        all_services = await Invoice.find({}, { service: 1, _id: 0 });
+        res.send({ status: "Hello, This is Alex's Website" });
+    })();
+});
 module.exports = router;
